@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KUTIN BINARY - Login</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        kutin: {
+                            bg: '#141021',
+                            card: '#1F1936',
+                            cardHover: '#282041',
+                            accent: '#7C3AED',
+                            success: '#22c55e',
+                            danger: '#ff444f'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-kutin-bg text-gray-100 font-sans antialiased h-screen flex items-center justify-center p-4 relative overflow-hidden">
+
+    <!-- Background Gradients matching PalOption mobile header style -->
+    <div class="absolute top-0 left-0 w-full h-full pointer-events-none">
+        <div class="absolute -top-24 -right-24 w-96 h-96 rounded-full bg-kutin-accent/10 blur-3xl"></div>
+        <div class="absolute -bottom-24 -left-24 w-96 h-96 rounded-full bg-pink-500/10 blur-3xl"></div>
+    </div>
+
+    <!-- Auth Card -->
+    <div class="w-full max-w-md bg-kutin-card border border-white/[0.07] rounded-2xl shadow-2xl relative z-10 overflow-hidden">
+        
+        <!-- Top Accent Bar -->
+        <div class="h-1.5 w-full bg-gradient-to-r from-kutin-accent via-purple-500 to-pink-500"></div>
+
+        <div class="p-8">
+            <!-- Logo Area -->
+            <div class="flex flex-col items-center mb-8">
+                <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-kutin-accent to-pink-500 flex items-center justify-center mb-4 shadow-lg shadow-kutin-accent/20">
+                    <i data-lucide="trending-up" class="text-white w-6 h-6"></i>
+                </div>
+                <h1 class="text-2xl font-bold text-white tracking-tight">KUTIN BINARY</h1>
+                <p class="text-sm text-gray-400 mt-1" id="subtitle">Sign in to your trading account</p>
+            </div>
+
+            <!-- Form -->
+            <form id="auth-form" class="space-y-4">
+                
+                <div id="name-field" class="hidden">
+                    <label class="block text-[11px] font-bold uppercase tracking-wider text-gray-500 mb-1.5">Full Name</label>
+                    <input type="text" id="full-name" class="w-full bg-[#181329] border border-white/[0.07] rounded-lg px-4 py-3 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-kutin-accent focus:ring-1 focus:ring-kutin-accent transition-all">
+                </div>
+
+                <div>
+                    <label class="block text-[11px] font-bold uppercase tracking-wider text-gray-500 mb-1.5">Email Address</label>
+                    <input type="email" id="email" required class="w-full bg-[#181329] border border-white/[0.07] rounded-lg px-4 py-3 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-kutin-accent focus:ring-1 focus:ring-kutin-accent transition-all" placeholder="trader@example.com">
+                </div>
+
+                <div>
+                    <label class="block text-[11px] font-bold uppercase tracking-wider text-gray-500 mb-1.5">Password</label>
+                    <input type="password" id="password" required class="w-full bg-[#181329] border border-white/[0.07] rounded-lg px-4 py-3 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-kutin-accent focus:ring-1 focus:ring-kutin-accent transition-all" placeholder="••••••••">
+                </div>
+
+                <p id="error-message" class="text-kutin-danger text-xs text-center hidden bg-kutin-danger/10 py-2 rounded-lg border border-kutin-danger/20"></p>
+
+                <button type="submit" id="submit-btn" class="w-full bg-kutin-accent hover:bg-[#6D28D9] text-white font-bold py-3.5 rounded-xl shadow-lg shadow-kutin-accent/25 transition-all active:scale-[0.98] flex items-center justify-center gap-2 mt-2">
+                    <span id="btn-text">Sign In</span>
+                </button>
+            </form>
+
+            <!-- Toggle -->
+            <div class="mt-6 text-center">
+                <p class="text-xs text-gray-500">
+                    <span id="switch-text">Don't have an account?</span> 
+                    <button type="button" onclick="toggleMode()" class="text-kutin-accent font-bold hover:text-purple-400 transition-colors ml-1" id="switch-btn">Sign Up</button>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        const SUPABASE_URL = 'YOUR_SUPABASE_URL';
+        const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        let isLogin = true;
+
+        function toggleMode() {
+            isLogin = !isLogin;
+            const nameField = document.getElementById('name-field');
+            const subtitle = document.getElementById('subtitle');
+            const btnText = document.getElementById('btn-text');
+            const switchText = document.getElementById('switch-text');
+            const switchBtn = document.getElementById('switch-btn');
+            const errorMsg = document.getElementById('error-message');
+
+            if (isLogin) {
+                nameField.classList.add('hidden');
+                subtitle.innerText = 'Sign in to your trading account';
+                btnText.innerText = 'Sign In';
+                switchText.innerText = "Don't have an account?";
+                switchBtn.innerText = 'Sign Up';
+            } else {
+                nameField.classList.remove('hidden');
+                subtitle.innerText = 'Create your trading account';
+                btnText.innerText = 'Create Account';
+                switchText.innerText = 'Already have an account?';
+                switchBtn.innerText = 'Sign In';
+            }
+            errorMsg.classList.add('hidden');
+        }
+
+        document.getElementById('auth-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const fullName = document.getElementById('full-name').value;
+            const errorMsg = document.getElementById('error-message');
+            const submitBtn = document.getElementById('submit-btn');
+            const btnText = document.getElementById('btn-text');
+
+            submitBtn.disabled = true;
+            btnText.innerText = 'Processing...';
+            errorMsg.classList.add('hidden');
+
+            try {
+                if (isLogin) {
+                    const { error } = await supabase.auth.signInWithPassword({ email, password });
+                    if (error) throw error;
+                } else {
+                    const { data, error } = await supabase.auth.signUp({ 
+                        email, 
+                        password,
+                        options: { data: { full_name: fullName } }
+                    });
+                    if (error) throw error;
+                    if (data.user && !data.session) {
+                        alert('Please check your email to confirm your account.');
+                        toggleMode();
+                        return;
+                    }
+                }
+                window.location.href = 'dashboard.html';
+            } catch (error) {
+                errorMsg.innerText = error.message;
+                errorMsg.classList.remove('hidden');
+                submitBtn.disabled = false;
+                btnText.innerText = isLogin ? 'Sign In' : 'Create Account';
+            }
+        });
+
+        // Redirect if already logged in
+        supabase.auth.getSession().then(({ data: { session } }) => {
+            if (session) window.location.href = 'dashboard.html';
+        });
+    </script>
+</body>
+</html>
