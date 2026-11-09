@@ -1,1 +1,550 @@
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>KUTIN BINARY | Positions</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        :root {
+            --bg-dark: #0e0e0e;
+            --bg-card: #151717;
+            --bg-card-hover: #242828;
+            --primary-purple: #7C3AED;
+            --primary-pink: #EC4899;
+            --text-white: #ffffff;
+            --text-gray: #c2c2c2;
+            --success-green: #4bb4b3;
+            --danger-red: #ff444f;
+            --warning-orange: #f59e0b;
+            --border-color: #323738;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        
+        body {
+            background: var(--bg-dark);
+            color: var(--text-white);
+            font-family: 'IBM Plex Sans', system-ui, sans-serif;
+            font-size: 10px;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .app-banner {
+            background: linear-gradient(135deg, var(--primary-purple), var(--primary-pink));
+            padding: 5px 8px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-shrink: 0;
+        }
+        .app-banner-content { display: flex; align-items: center; gap: 5px; }
+        .app-banner-icon { width: 20px; height: 20px; background: rgba(255,255,255,0.2); border-radius: 5px; display: flex; align-items: center; justify-content: center; }
+        .app-banner-icon svg { width: 12px; height: 12px; color: white; }
+        .app-banner-text h4 { font-size: 10px; font-weight: 700; color: white; }
+        .app-banner-text p { font-size: 8px; color: rgba(255,255,255,0.9); }
+        .app-banner-actions { display: flex; align-items: center; gap: 5px; }
+        .app-banner-download { background: white; color: var(--primary-purple); border: none; padding: 3px 8px; border-radius: 10px; font-weight: 700; font-size: 9px; cursor: pointer; }
+        .app-banner-close { background: rgba(255,255,255,0.2); border: none; width: 16px; height: 16px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; color: white; font-size: 10px; }
+
+        .top-nav {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 6px 8px;
+            background: var(--bg-dark);
+            border-bottom: 1px solid var(--border-color);
+            flex-shrink: 0;
+        }
+        .nav-left { display: flex; align-items: center; gap: 6px; }
+        .menu-btn { background: none; border: none; color: white; cursor: pointer; padding: 2px; }
+        .logo-btn { width: 24px; height: 24px; background: var(--primary-purple); border-radius: 5px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 11px; color: white; }
+        
+        .account-selector-wrap { position: relative; }
+        .account-selector { 
+            display: flex; align-items: center; gap: 4px; 
+            background: var(--bg-card); 
+            padding: 3px 6px; border-radius: 5px; cursor: pointer; 
+            border: 1px solid var(--border-color);
+        }
+        .account-icon { width: 14px; height: 14px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 8px; color: white; }
+        .account-icon.real { background: var(--primary-purple); }
+        .account-icon.demo { background: var(--danger-red); }
+        .account-balance { font-weight: 700; font-size: 10px; }
+        
+        .account-dropdown {
+            display: none; position: absolute; top: 110%; left: 0; width: 130px;
+            background: var(--bg-card); border: 1px solid var(--border-color);
+            border-radius: 5px; box-shadow: 0 4px 12px rgba(0,0,0,0.5); z-index: 100;
+        }
+        .account-dropdown.show { display: block; }
+        .dropdown-item { padding: 6px 8px; font-size: 10px; color: var(--text-gray); cursor: pointer; display: flex; align-items: center; gap: 5px; }
+        .dropdown-item:hover { background: var(--bg-card-hover); color: white; }
+        .dropdown-item.active { color: var(--primary-purple); font-weight: 600; }
+
+        .nav-right { display: flex; align-items: center; gap: 5px; }
+        .icon-btn { background: none; border: none; color: var(--text-gray); cursor: pointer; padding: 3px; display: flex; align-items: center; justify-content: center; }
+        .icon-btn svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 2; }
+        .deposit-btn { background: var(--primary-purple); color: white; border: none; padding: 5px 10px; border-radius: 5px; font-weight: 700; font-size: 10px; cursor: pointer; }
+
+        .tabs { display: flex; background: var(--bg-dark); border-bottom: 1px solid var(--border-color); flex-shrink: 0; }
+        .tab { flex: 1; padding: 8px; text-align: center; cursor: pointer; font-weight: 600; font-size: 10px; color: var(--text-gray); border-bottom: 2px solid transparent; }
+        .tab.active { color: var(--primary-purple); border-bottom-color: var(--primary-purple); }
+
+        .scroll-container {
+            flex: 1;
+            overflow-y: auto;
+            padding-bottom: 110px;
+        }
+
+        .empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; min-height: 200px; text-align: center; color: var(--text-gray); }
+        .empty-icon { width: 40px; height: 40px; background: rgba(255, 68, 79, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 8px; }
+        .empty-icon svg { width: 20px; height: 20px; stroke: var(--text-gray); fill: none; stroke-width: 1.5; }
+        .empty-title { font-size: 12px; font-weight: 700; color: white; margin-bottom: 3px; }
+        .empty-subtitle { font-size: 9px; }
+
+        .trade-list { padding: 6px; display: flex; flex-direction: column; gap: 6px; }
+        .trade-card { 
+            background: var(--bg-card); 
+            border: 1px solid var(--border-color); 
+            border-radius: 8px; 
+            padding: 8px; 
+        }
+        .card-top { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: flex-start; 
+            margin-bottom: 6px; 
+        }
+        .card-asset-group { display: flex; flex-direction: column; gap: 1px; }
+        .card-asset { font-weight: 700; font-size: 11px; color: white; }
+        .card-subtitle { font-size: 9px; color: var(--text-gray); }
+        .card-status { font-size: 10px; margin-top: 2px; }
+        .card-status.won { color: var(--success-green); }
+        .card-status.lost { color: var(--danger-red); }
+        
+        .card-direction-badge { 
+            display: flex; 
+            align-items: center; 
+            gap: 3px; 
+            font-size: 10px; 
+            font-weight: 600;
+        }
+        .card-direction-badge .dot { width: 5px; height: 5px; border-radius: 50%; background: var(--danger-red); }
+        .card-direction-badge.EVEN .dot { background: var(--success-green); }
+        .card-direction-badge.ODD { color: var(--danger-red); }
+        .card-direction-badge.EVEN { color: var(--success-green); }
+        
+        .usd-badge { 
+            background: rgba(255,255,255,0.08); 
+            padding: 2px 6px; 
+            border-radius: 3px; 
+            font-size: 9px; 
+            font-weight: 600; 
+            margin-bottom: 6px;
+            display: inline-block;
+        }
+        
+        .card-grid { 
+            display: grid; 
+            grid-template-columns: 1fr 1fr; 
+            gap: 6px; 
+            margin-top: 6px; 
+        }
+        .card-grid-item { display: flex; flex-direction: column; gap: 1px; }
+        .card-grid-label { font-size: 9px; color: var(--text-gray); }
+        .card-grid-value { font-size: 10px; font-weight: 700; color: white; }
+        .card-grid-value.positive { color: var(--success-green); }
+        .card-grid-value.negative { color: var(--danger-red); }
+
+        .tx-list { padding: 6px; display: flex; flex-direction: column; gap: 6px; }
+        .tx-item { 
+            display: flex; 
+            align-items: center; 
+            gap: 10px; 
+            padding: 10px; 
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+        }
+        .tx-icon { 
+            width: 32px; 
+            height: 32px; 
+            border-radius: 50%; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            flex-shrink: 0;
+        }
+        .tx-icon.win { background: rgba(75, 180, 179, 0.2); }
+        .tx-icon.stake { background: rgba(245, 158, 11, 0.2); }
+        .tx-icon.loss { background: rgba(255, 68, 79, 0.2); }
+        .tx-icon svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 2.5; }
+        .tx-icon.win svg { color: var(--success-green); }
+        .tx-icon.stake svg { color: var(--warning-orange); }
+        .tx-icon.loss svg { color: var(--danger-red); }
+        
+        .tx-content { flex: 1; display: flex; flex-direction: column; gap: 2px; }
+        .tx-title-row { display: flex; align-items: center; gap: 4px; }
+        .tx-title { font-weight: 700; font-size: 11px; }
+        .tx-title.win { color: var(--success-green); }
+        .tx-title.stake { color: white; }
+        .tx-title.loss { color: var(--danger-red); }
+        .tx-badge { 
+            background: rgba(255,255,255,0.08); 
+            padding: 2px 5px; 
+            border-radius: 4px; 
+            font-size: 8px; 
+            color: var(--text-gray); 
+        }
+        .tx-sub { font-size: 9px; color: var(--text-gray); }
+        .tx-right { text-align: right; display: flex; flex-direction: column; gap: 2px; }
+        .tx-amount { font-weight: 700; font-size: 11px; }
+        .tx-amount.win { color: var(--success-green); }
+        .tx-amount.stake { color: var(--warning-orange); }
+        .tx-amount.loss { color: var(--danger-red); }
+        .tx-balance { font-size: 9px; color: var(--text-gray); }
+
+        .bottom-stats {
+            position: fixed;
+            bottom: 50px;
+            left: 0;
+            right: 0;
+            background: var(--bg-card);
+            border-top: 1px solid var(--border-color);
+            padding: 6px 10px;
+            z-index: 999;
+        }
+        .stat-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+        .stat-row:last-child { margin-bottom: 0; }
+        .stat-label { font-size: 10px; color: var(--text-gray); display: flex; align-items: center; gap: 4px; }
+        .stat-label .dot { width: 5px; height: 5px; border-radius: 50%; background: var(--warning-orange); }
+        .stat-value { font-size: 10px; font-weight: 700; color: white; }
+        .stat-value.neg { color: var(--danger-red); }
+        .stat-value.pos { color: var(--success-green); }
+        .stat-trade-count { font-size: 9px; color: var(--text-gray); }
+
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            background: var(--bg-dark);
+            border-top: 1px solid var(--border-color);
+            padding: 5px 0 8px 0;
+            z-index: 1000;
+        }
+        .nav-item { display: flex; flex-direction: column; align-items: center; gap: 2px; color: var(--text-gray); text-decoration: none; font-size: 8px; font-weight: 600; flex: 1; }
+        .nav-item.active { color: var(--primary-purple); }
+        .nav-icon { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 2; }
+        .ai-icon-wrap { width: 30px; height: 30px; background: linear-gradient(135deg, var(--primary-purple), var(--primary-pink)); border-radius: 8px; display: flex; align-items: center; justify-content: center; margin-top: -14px; box-shadow: 0 4px 10px rgba(124, 58, 237, 0.4); }
+        .ai-icon { width: 16px; height: 16px; stroke: white; fill: none; stroke-width: 2; }
+    </style>
+</head>
+<body>
+    <div class="app-banner" id="appBanner">
+        <div class="app-banner-content">
+            <div class="app-banner-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg></div>
+            <div class="app-banner-text"><h4>Get the KUTIN BINARY App</h4><p>Get a better trading experience</p></div>
+        </div>
+        <div class="app-banner-actions">
+            <button class="app-banner-download" onclick="window.location.href='download.html'">Download</button>
+            <button class="app-banner-close" onclick="document.getElementById('appBanner').style.display='none'">×</button>
+        </div>
+    </div>
+
+    <nav class="top-nav">
+        <div class="nav-left">
+            <button class="menu-btn" onclick="window.location.href='dashboard.html'"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg></button>
+            <div class="logo-btn">K</div>
+            <div class="account-selector-wrap">
+                <div class="account-selector" onclick="toggleAccountMenu()">
+                    <div class="account-icon" id="navAccountIcon">D</div>
+                    <span class="account-balance" id="navAccountBalance">$ 10,000.00</span>
+                    <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                </div>
+                <div class="account-dropdown" id="accountDropdown">
+                    <div class="dropdown-item" id="optDemo" onclick="switchAccount('demo')">
+                        <div class="account-icon demo" style="width:12px;height:12px;font-size:7px;">D</div> Demo
+                    </div>
+                    <div class="dropdown-item" id="optReal" onclick="switchAccount('real')">
+                        <div class="account-icon real" style="width:12px;height:12px;font-size:7px;">R</div> Real
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="nav-right">
+            <button class="icon-btn"><svg viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg></button>
+            <button class="deposit-btn" onclick="window.location.href='deposit.html'">Deposit</button>
+            <button class="icon-btn"><svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg></button>
+        </div>
+    </nav>
+
+    <div class="tabs">
+        <div class="tab active" id="tabOpen" onclick="switchTab('open')">Open (0)</div>
+        <div class="tab" id="tabClosed" onclick="switchTab('closed')">Closed (0)</div>
+        <div class="tab" id="tabTransactions" onclick="switchTab('transactions')">Transactions</div>
+    </div>
+
+    <div class="scroll-container" id="scrollContainer"></div>
+
+    <div class="bottom-stats">
+        <div class="stat-row">
+            <span class="stat-label" id="modeLabel"><span class="dot"></span>Manual</span>
+            <span class="stat-trade-count" id="tradeCount">0 trades (0W / 0L)</span>
+        </div>
+        <div class="stat-row">
+            <span class="stat-label">Session P/L:</span>
+            <span class="stat-value" id="sessionPnl">$0.00</span>
+        </div>
+    </div>
+
+    <nav class="bottom-nav">
+        <a href="dashboard.html" class="nav-item">
+            <svg class="nav-icon" viewBox="0 0 24 24"><line x1="18" x2="18" y1="20" y2="10"></line><line x1="12" x2="12" y1="20" y2="4"></line><line x1="6" x2="6" y1="20" y2="14"></line></svg>
+            <span>Trade</span>
+        </a>
+        <a href="ai.html" class="nav-item">
+            <div class="ai-icon-wrap"><svg class="ai-icon" viewBox="0 0 24 24"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 16.8l-6.2 4.5 2.4-7.4L2 9.4h7.6z"/></svg></div>
+            <span>AI</span>
+        </a>
+        <a href="positions.html" class="nav-item active">
+            <svg class="nav-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+            <span>Positions</span>
+        </a>
+    </nav>
+
+    <script>
+        let currentAccount = localStorage.getItem('kutin_account_mode') || 'demo';
+        let demoBalance = parseFloat(localStorage.getItem('kutin_demo_balance')) || 10000.00;
+        let realBalance = 0.00;
+        let allTrades = [];
+        let currentTab = 'open';
+
+        if (!sessionStorage.getItem('sessionStartTime')) {
+            sessionStorage.setItem('sessionStartTime', new Date().toISOString());
+        }
+
+        if (typeof window.supabase !== 'undefined') {
+            window.kutinSupabase = window.supabase.createClient(
+                'https://nngujzgkkxjfzrqoytit.supabase.co',
+                'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5uZ3Vqemdra3hqZnpycW95dGl0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTI5MjcwMjgsImV4cCI6MjEwODUwMzAyOH0.zY1VEOox2NzdUHgqKHtbZJuPQ6QZQGMLZzmKNu_qe2s'
+            );
+        }
+
+        function toggleAccountMenu() { document.getElementById('accountDropdown').classList.toggle('show'); }
+        
+        function switchAccount(type) {
+            currentAccount = type;
+            localStorage.setItem('kutin_account_mode', type);
+            document.getElementById('accountDropdown').classList.remove('show');
+            loadPositions(); // Reload positions and balances when account switches
+        }
+        
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.account-selector-wrap')) document.getElementById('accountDropdown').classList.remove('show');
+        });
+
+        // Fetch real balance from Supabase so it shows correctly here too
+        async function loadUserBalances() {
+            if (!window.kutinSupabase) return;
+            try {
+                const { data: { user } } = await window.kutinSupabase.auth.getUser();
+                if (user) {
+                    const { data: profile, error } = await window.kutinSupabase
+                        .from('profiles')
+                        .select('balance, demo_balance')
+                        .eq('id', user.id)
+                        .single();
+                    
+                    if (!error && profile) {
+                        realBalance = parseFloat(profile.balance || 0);
+                        demoBalance = parseFloat(profile.demo_balance || 10000);
+                        localStorage.setItem('kutin_demo_balance', demoBalance);
+                    }
+                }
+            } catch (e) {
+                console.error("Error loading balances:", e);
+            }
+        }
+
+        function updateTopNav() {
+            const icon = document.getElementById('navAccountIcon');
+            const balance = document.getElementById('navAccountBalance');
+            const optDemo = document.getElementById('optDemo');
+            const optReal = document.getElementById('optReal');
+            if (currentAccount === 'real') {
+                icon.className = 'account-icon real'; icon.innerText = 'R'; balance.innerText = '$ ' + realBalance.toFixed(2);
+                optReal.classList.add('active'); optDemo.classList.remove('active');
+            } else {
+                icon.className = 'account-icon demo'; icon.innerText = 'D'; balance.innerText = '$ ' + demoBalance.toFixed(2);
+                optDemo.classList.add('active'); optReal.classList.remove('active');
+            }
+        }
+
+        function switchTab(tab) {
+            currentTab = tab;
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.getElementById('tab' + tab.charAt(0).toUpperCase() + tab.slice(1)).classList.add('active');
+            renderView();
+        }
+
+        function formatDate(dateString) {
+            if(!dateString) return 'Today';
+            const d = new Date(dateString);
+            const now = new Date();
+            const isToday = d.toDateString() === now.toDateString();
+            const timeStr = d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', second: '2-digit', hour12: true });
+            return `${isToday ? 'Today' : d.toLocaleDateString('en-GB')} ${timeStr}`;
+        }
+
+        function getAssetName(asset) {
+            if (!asset) return 'Volatility 10 (1s)';
+            const names = { 'VOL_10': 'Volatility 10 (1s)', 'VOL_25': 'Volatility 25 (1s)', 'VOL_30': 'Volatility 30 (1s)', 'VOL_50': 'Volatility 50 (1s)', 'VOL_75': 'Volatility 75 (1s)', 'VOL_100': 'Volatility 100 (1s)' };
+            return names[asset] || asset;
+        }
+
+        function updateModeLabel() {
+            let mode = localStorage.getItem('kutin_trade_mode');
+            if (!mode && allTrades.length > 0) mode = allTrades[0].mode;
+            mode = (mode || 'AUTO').toString().toUpperCase();
+            const isAuto = mode.includes('AUTO');
+            const label = document.getElementById('modeLabel');
+            if (label) label.innerHTML = '<span class="dot"></span>' + (isAuto ? 'Auto-Trading' : 'Manual');
+        }
+
+        function renderView() {
+            updateModeLabel();
+            const container = document.getElementById('scrollContainer');
+            const sessionPnl = document.getElementById('sessionPnl');
+            const tradeCount = document.getElementById('tradeCount');
+            const tabOpen = document.getElementById('tabOpen');
+            const tabClosed = document.getElementById('tabClosed');
+
+            const sessionStart = new Date(sessionStorage.getItem('sessionStartTime'));
+            const sessionTrades = allTrades.filter(t => new Date(t.created_at) >= sessionStart);
+            
+            const sessionWins = sessionTrades.filter(t => t.status === 'WON').length;
+            const sessionLosses = sessionTrades.filter(t => t.status === 'LOST' || t.status === 'CLOSED').length;
+            
+            let sessionTotalPnl = sessionTrades.reduce((sum, t) => {
+                if (t.status === 'WON') return sum + (parseFloat(t.payout || 0) - parseFloat(t.stake || 0));
+                if (t.status === 'LOST' || t.status === 'CLOSED') return sum - parseFloat(t.stake || 0);
+                return sum;
+            }, 0);
+
+            tradeCount.innerText = `${sessionTrades.length} trades (${sessionWins}W / ${sessionLosses}L)`;
+            sessionPnl.innerText = (sessionTotalPnl >= 0 ? '+' : '') + sessionTotalPnl.toFixed(2) + ' USD';
+            sessionPnl.className = 'stat-value ' + (sessionTotalPnl >= 0 ? 'pos' : 'neg');
+
+            const openTrades = allTrades.filter(t => t.status === 'OPEN');
+            const closedTrades = allTrades.filter(t => t.status !== 'OPEN');
+            tabOpen.innerText = `Open (${openTrades.length})`;
+            tabClosed.innerText = `Closed (${closedTrades.length})`;
+
+            if (currentTab === 'open') {
+                if (openTrades.length === 0) {
+                    container.innerHTML = `<div class="empty-state"><div class="empty-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="3"></circle></svg></div><h2 class="empty-title">No open positions</h2><p class="empty-subtitle">Your active trades will appear here</p></div>`;
+                } else {
+                    let html = '<div class="trade-list">';
+                    openTrades.forEach(t => {
+                        const dir = (t.direction || 'EVEN').toUpperCase();
+                        const mode = (t.mode || 'MANUAL').toString().toUpperCase();
+                        html += `<div class="trade-card"><div class="card-top"><div class="card-asset-group"><span class="card-asset">${getAssetName(t.asset)}</span><span class="card-status">Open</span></div><div class="card-direction-badge ${dir}"><span class="dot"></span> ${dir}</div></div><div class="card-grid"><div class="card-grid-item"><span class="card-grid-label">Stake:</span><span class="card-grid-value">$${parseFloat(t.stake || 0).toFixed(2)}</span></div><div class="card-grid-item"><span class="card-grid-label">Entry:</span><span class="card-grid-value">${parseFloat(t.entry_price || 0).toFixed(2)}</span></div></div><div style="text-align:center;margin-top:6px;"><span style="background:rgba(124,58,237,0.15);color:var(--primary-purple);font-size:8px;font-weight:600;padding:2px 6px;border-radius:6px;">${mode.includes('AUTO') ? 'Auto-Trading' : 'Manual'}</span></div></div>`;
+                    });
+                    html += '</div>'; container.innerHTML = html;
+                }
+            } 
+            else if (currentTab === 'closed') {
+                if (closedTrades.length === 0) {
+                    container.innerHTML = `<div class="empty-state"><div class="empty-icon"><svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"></path><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"></path></svg></div><h2 class="empty-title">No closed positions</h2><p class="empty-subtitle">Your completed trades will appear here</p></div>`;
+                } else {
+                    let html = '<div class="trade-list">';
+                    closedTrades.forEach(t => {
+                        const dir = (t.direction || 'EVEN').toUpperCase();
+                        const isWin = t.status === 'WON';
+                        const pnlVal = isWin ? (parseFloat(t.payout || 0) - parseFloat(t.stake || 0)) : -parseFloat(t.stake || 0);
+                        const contractValue = isWin ? parseFloat(t.payout || 0) : 0;
+                        const potentialPayout = (parseFloat(t.stake || 0) * 1.952).toFixed(2);
+                        const mode = (t.mode || 'MANUAL').toString().toUpperCase();
+                        html += `<div class="trade-card"><div class="card-top"><div class="card-asset-group"><span class="card-asset">${getAssetName(t.asset)}</span><span class="card-subtitle">Index</span><span class="card-status ${isWin ? 'won' : 'lost'}">Closed</span></div><div class="card-direction-badge ${dir}"><span class="dot"></span> ${dir}</div></div><span class="usd-badge">USD</span><div class="card-grid"><div class="card-grid-item"><span class="card-grid-label">Total profit/loss:</span><span class="card-grid-value ${isWin ? 'positive' : 'negative'}">${isWin ? '+' : ''}${pnlVal.toFixed(2)}</span></div><div class="card-grid-item"><span class="card-grid-label">Contract value:</span><span class="card-grid-value ${isWin ? 'positive' : 'negative'}">${contractValue.toFixed(2)}</span></div><div class="card-grid-item"><span class="card-grid-label">Stake:</span><span class="card-grid-value">${parseFloat(t.stake || 0).toFixed(2)}</span></div><div class="card-grid-item"><span class="card-grid-label">Potential payout:</span><span class="card-grid-value">${potentialPayout}</span></div></div><div style="text-align:center;margin-top:6px;"><span style="background:rgba(124,58,237,0.15);color:var(--primary-purple);font-size:8px;font-weight:600;padding:2px 6px;border-radius:6px;">${mode.includes('AUTO') ? 'Auto-Trading' : 'Manual'}</span></div></div>`;
+                    });
+                    html += '</div>'; container.innerHTML = html;
+                }
+            } 
+            else if (currentTab === 'transactions') {
+                if (allTrades.length === 0) {
+                    container.innerHTML = `<div class="empty-state"><div class="empty-icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg></div><h2 class="empty-title">No transactions</h2><p class="empty-subtitle">Your history will appear here</p></div>`;
+                } else {
+                    let html = '<div class="tx-list">';
+                    let runningBalance = currentAccount === 'real' ? realBalance : demoBalance;
+                    const sortedTrades = [...allTrades].sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+                    
+                    sortedTrades.forEach(t => {
+                        const dir = (t.direction || 'EVEN').toUpperCase();
+                        const isWin = t.status === 'WON';
+                        const isLoss = t.status === 'LOST' || t.status === 'CLOSED';
+                        const assetShort = t.asset ? t.asset.replace('VOL_', 'V') + ' (1s)' : 'V10 (1s)';
+                        const dateStr = formatDate(t.created_at);
+                        const stake = parseFloat(t.stake || 0);
+                        
+                        runningBalance -= stake;
+                        html += `<div class="tx-item"><div class="tx-icon stake"><svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg></div><div class="tx-content"><div class="tx-title-row"><span class="tx-title stake">Stake</span><span class="tx-badge">${assetShort}</span></div><span class="tx-sub">${dir} • ${dateStr}</span></div><div class="tx-right"><div class="tx-amount stake">-${stake.toFixed(2)}</div><div class="tx-balance">Bal: ${runningBalance.toFixed(2)}</div></div></div>`;
+                        
+                        if (isWin) {
+                            const payout = parseFloat(t.payout || 0);
+                            runningBalance += payout;
+                            html += `<div class="tx-item"><div class="tx-icon win"><svg viewBox="0 0 24 24"><polyline points="20 6 12 14 4 6"></polyline></svg></div><div class="tx-content"><div class="tx-title-row"><span class="tx-title win">Closed</span><span class="tx-badge">${assetShort}</span></div><span class="tx-sub">${dir} • ${dateStr}</span></div><div class="tx-right"><div class="tx-amount win">+${payout.toFixed(2)}</div><div class="tx-balance">Bal: ${runningBalance.toFixed(2)}</div></div></div>`;
+                        } else if (isLoss) {
+                            html += `<div class="tx-item"><div class="tx-icon loss"><svg viewBox="0 0 24 24"><polyline points="6 15 12 9 18 15"></polyline></svg></div><div class="tx-content"><div class="tx-title-row"><span class="tx-title loss">Closed</span><span class="tx-badge">${assetShort}</span></div><span class="tx-sub">${dir} • ${dateStr}</span></div><div class="tx-right"><div class="tx-amount loss">-${stake.toFixed(2)}</div><div class="tx-balance">Bal: ${runningBalance.toFixed(2)}</div></div></div>`;
+                        }
+                    });
+                    html += '</div>'; container.innerHTML = html;
+                }
+            }
+        }
+
+        async function loadPositions() {
+            // Fetch balances first so the UI shows the correct Real/Demo balance
+            await loadUserBalances();
+            updateTopNav();
+            
+            if (!window.kutinSupabase) { renderView(); return; }
+            try {
+                const { data: { user }, error: authError } = await window.kutinSupabase.auth.getUser();
+                if (authError || !user) { renderView(); return; }
+                
+                // Fetch trades specifically for the current account type ('real' or 'demo')
+                const { data: trades, error } = await window.kutinSupabase
+                    .from('trades')
+                    .select('*')
+                    .eq('user_id', user.id)
+                    .eq('account_type', currentAccount)
+                    .order('created_at', { ascending: false });
+                
+                if (!error && trades) {
+                    allTrades = trades;
+                } else if (error) {
+                    console.error("Supabase error fetching trades:", error);
+                }
+                renderView();
+            } catch (e) { 
+                console.error('Error loading positions:', e); 
+                renderView(); 
+            }
+        }
+        
+        // Initial load
+        loadPositions();
+    </script>
+</body>
+</html>
