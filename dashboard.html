@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>KUTIN BINARY | Trade</title>
-    <link rel="stylesheet" href="styles.css">
+    <!-- ✅ FIX 1: Cache-busting version to force browser to download fresh CSS -->
+    <link rel="stylesheet" href="styles.css?v=99">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     
     <style>
@@ -33,9 +34,10 @@
         body.dark-theme .volatility-item:hover, body.dark-theme .notif-item:hover, body.dark-theme .account-option:hover, body.dark-theme .payment-method:hover { background: rgba(124, 58, 237, 0.15); }
         body.dark-theme .volatility-item.active { background: rgba(124, 58, 237, 0.25); }
 
+        /* ✅ FIX 2: !important flags to absolutely guarantee styles.css cannot turn the background white */
         body { 
-            background-color: var(--bg-main); 
-            color: var(--text-white); 
+            background-color: var(--bg-main) !important; 
+            color: var(--text-white) !important; 
             font-family: system-ui, -apple-system, sans-serif; 
             transition: background-color 0.3s, color 0.3s; 
             margin: 0;
@@ -51,7 +53,7 @@
         .notif-wrapper { position: relative; flex-shrink: 0; }
 
         #chartCanvas { width: 100%; height: 100%; display: block; }
-        .chart-wrapper { position: relative; height: 340px; padding: 0 12px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; margin: 8px 12px; overflow: hidden; flex-shrink: 0; box-shadow: 0 1px 3px rgba(0,0,0,0.05); transition: background 0.3s, border-color 0.3s; }
+        .chart-wrapper { position: relative; height: 340px; padding: 0 12px; background: var(--bg-card) !important; border: 1px solid var(--border-color); border-radius: 12px; margin: 8px 12px; overflow: hidden; flex-shrink: 0; box-shadow: 0 1px 3px rgba(0,0,0,0.05); transition: background 0.3s, border-color 0.3s; }
         .axis-labels-right { position: absolute; right: 12px; top: 0; bottom: 30px; display: flex; flex-direction: column; justify-content: space-between; pointer-events: none; z-index: 5; }
         .axis-label-r { font-size: 0.65rem; color: var(--text-gray); text-align: right; width: 45px; }
         .axis-labels-bottom { position: absolute; left: 12px; right: 55px; bottom: 0; display: flex; justify-content: space-between; pointer-events: none; z-index: 5; }
