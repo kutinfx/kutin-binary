@@ -8,7 +8,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     
     <style>
-        /* ✅ DARK MODE IS NOW THE DEFAULT */
+        /* ✅ DARK MODE IS NOW THE HARD DEFAULT */
         :root {
             --bg-main: #141021;
             --bg-card: #1e1b4b;
@@ -20,7 +20,6 @@
             --border-color: rgba(255, 255, 255, 0.1);
         }
 
-        /* Light mode is now the override */
         body.light-theme {
             --bg-main: #f8fafc;
             --bg-card: #ffffff;
@@ -34,7 +33,14 @@
         body.dark-theme .volatility-item:hover, body.dark-theme .notif-item:hover, body.dark-theme .account-option:hover, body.dark-theme .payment-method:hover { background: rgba(124, 58, 237, 0.15); }
         body.dark-theme .volatility-item.active { background: rgba(124, 58, 237, 0.25); }
 
-        body { background-color: var(--bg-main); color: var(--text-white); font-family: system-ui, -apple-system, sans-serif; transition: background-color 0.3s, color 0.3s; }
+        body { 
+            background-color: var(--bg-main); 
+            color: var(--text-white); 
+            font-family: system-ui, -apple-system, sans-serif; 
+            transition: background-color 0.3s, color 0.3s; 
+            margin: 0;
+            padding: 0;
+        }
 
         .top-header { display: flex; align-items: center; justify-content: space-between; padding: 10px 12px; background: var(--bg-card); border-bottom: 1px solid var(--border-color); position: sticky; top: 0; z-index: 50; box-shadow: 0 1px 3px rgba(0,0,0,0.05); transition: top 0.3s ease; }
         body.has-app-banner .top-header { top: 40px; } 
@@ -334,34 +340,33 @@
         .advanced-settings { display: none; margin-bottom: 12px; }
         .advanced-settings.show { display: flex; gap: 8px; }
 
-        /* ✅ MOBILE COMPACT LAYOUT FIXES */
+        /* ✅ ULTRA-COMPACT MOBILE LAYOUT FIXES TO PREVENT SCROLLING */
         @media (max-width: 768px) {
-            .chart-wrapper { height: 200px !important; margin: 4px 8px; }
-            .controls-panel { padding: 8px; padding-bottom: 80px; }
-            .mode-toggle { margin-bottom: 6px; padding: 2px; }
-            .mode-btn { padding: 5px; font-size: 0.65rem; }
-            .stake-wrapper { margin-bottom: 6px; }
-            .stake-box { padding: 6px 10px; }
-            .stake-input { font-size: 1.1rem; }
-            .quick-stakes { gap: 4px; margin-bottom: 6px; }
-            .qs-btn { padding: 4px 0; font-size: 0.6rem; }
-            .advanced-settings { gap: 4px; margin-bottom: 6px; }
-            .advanced-settings .stake-box { padding: 6px 4px; }
-            .advanced-settings .stake-input { font-size: 0.85rem; }
-            .advanced-settings .stake-label { font-size: 0.5rem; }
-            .live-stats-bar { padding: 6px 10px; margin-bottom: 6px; }
-            .trade-actions { gap: 6px; }
-            .btn-trade { min-height: 46px; padding: 8px 6px; font-size: 0.85rem; }
-            .digit-row { padding: 4px 6px 6px; margin: 0 8px 6px; gap: 2px; }
-            .circle-container { width: 26px; height: 26px; }
-            .digit-num { font-size: 0.65rem; }
-            .digit-pct { font-size: 0.45rem; }
-            .asset-tabs { padding: 8px !important; }
-            .asset-tab { padding: 5px 10px !important; font-size: 12px !important; }
+            .chart-wrapper { height: 180px !important; margin: 4px 8px !important; }
+            .controls-panel { padding: 6px !important; padding-bottom: 70px !important; }
+            .mode-toggle { margin-bottom: 4px !important; padding: 2px !important; }
+            .mode-btn { padding: 4px !important; font-size: 0.6rem !important; }
+            .stake-wrapper { margin-bottom: 4px !important; }
+            .stake-box { padding: 4px 8px !important; }
+            .stake-input { font-size: 1rem !important; }
+            .quick-stakes { gap: 3px !important; margin-bottom: 4px !important; }
+            .qs-btn { padding: 3px 0 !important; font-size: 0.55rem !important; }
+            .advanced-settings { gap: 3px !important; margin-bottom: 4px !important; }
+            .advanced-settings .stake-box { padding: 4px 2px !important; }
+            .advanced-settings .stake-input { font-size: 0.8rem !important; }
+            .advanced-settings .stake-label { font-size: 0.45rem !important; }
+            .live-stats-bar { padding: 4px 8px !important; margin-bottom: 4px !important; }
+            .trade-actions { gap: 4px !important; }
+            .btn-trade { min-height: 40px !important; padding: 6px 4px !important; font-size: 0.8rem !important; }
+            .digit-row { padding: 3px 4px 4px !important; margin: 0 4px 4px !important; gap: 1px !important; }
+            .circle-container { width: 24px !important; height: 24px !important; }
+            .digit-num { font-size: 0.6rem !important; }
+            .digit-pct { font-size: 0.4rem !important; }
+            .asset-tabs { padding: 6px !important; }
+            .asset-tab { padding: 4px 8px !important; font-size: 11px !important; }
         }
     </style>
 </head>
-<!-- ✅ ADDED dark-theme CLASS TO BODY BY DEFAULT -->
 <body class="dark-theme">
     <div class="app-download-banner" id="appDownloadBanner">
         <div class="app-banner-content">
@@ -880,7 +885,7 @@
             }
         }
 
-        // ✅ FIXED THEME TOGGLE TO USE kutin_theme AND PROPERLY TOGGLE CLASSES
+        // ✅ FORCE DARK THEME TO FIX WHITE SCREEN ISSUE
         function toggleDarkTheme() {
             const body = document.body;
             const toggle = document.getElementById('themeToggle');
@@ -898,21 +903,18 @@
         }
         
         (function initTheme() {
-            const savedTheme = localStorage.getItem('kutin_theme');
             const body = document.body;
             const toggle = document.getElementById('themeToggle');
             
-            if (savedTheme === 'light') {
-                body.classList.remove('dark-theme');
-                body.classList.add('light-theme');
-                if (toggle) toggle.classList.remove('active');
-            } else {
-                body.classList.add('dark-theme');
-                body.classList.remove('light-theme');
-                if (toggle) toggle.classList.add('active');
-            }
+            // FORCE DARK MODE AND CLEAR ANY OLD LIGHT SETTING
+            body.classList.add('dark-theme');
+            body.classList.remove('light-theme');
+            if (toggle) toggle.classList.add('active');
+            localStorage.setItem('kutin_theme', 'dark');
             
-            updateSoundIcon(); updateNotifDot(); updateAdvancedSettingsVisibility();
+            updateSoundIcon(); 
+            updateNotifDot(); 
+            updateAdvancedSettingsVisibility();
             
             const savedMode = localStorage.getItem('kutin_trade_mode') || 'AUTO';
             isAutoMode = (savedMode === 'AUTO');
@@ -925,7 +927,11 @@
                 modeBtns[1].classList.add('active');
             }
             
-            loadUserBalances();
+            // Ensure canvas is sized correctly after DOM is ready
+            setTimeout(() => {
+                loadUserBalances();
+                resizeCanvas();
+            }, 100);
         })();
 
         const digitCounts = new Array(10).fill(0);
@@ -1031,7 +1037,6 @@
         for(let i=0; i<MAX_POINTS; i++) updateChart();
         setInterval(updateChart, 1000);
         window.addEventListener('resize', resizeCanvas);
-        setTimeout(resizeCanvas, 100);
 
         function toggleVolatilityDropdown(event) { event.stopPropagation(); document.getElementById('volatility-dropdown').classList.toggle('show'); }
         function selectVolatility(name, element) {
